@@ -6,13 +6,13 @@ import AuthInputs from './AuthInputs.vue';
 <template>
   <div
     class="w-full max-w-[420px] rounded-2xl border border-[#242730]
-           bg-[#17191f] px-9 py-9 shadow-xl"
+          bg-[#17191f] px-9 py-9 shadow-xl"
   >
     <!-- Логотип -->
     <div class="flex flex-col items-center">
       <div
         class="h-9 w-9 rounded-md
-               bg-gradient-to-br from-[#8B5CF6] to-[#06B6D4]"
+              bg-gradient-to-br from-[#8B5CF6] to-[#06B6D4]"
       ></div>
 
       <h1 class="mt-4 text-xl font-semibold text-[#F3F4F6]">

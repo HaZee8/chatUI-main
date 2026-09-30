@@ -1,6 +1,6 @@
 <template>
 
-    <form class="mt-7 space-y-5">
+    <form @submit.prevent="submitAuth" class="mt-7 space-y-5">
 
       <!-- Пароль -->
       <div>
@@ -14,11 +14,11 @@
         <input
           id="username"
           placeholder="Логин"
-          v-model="data.username"
+          v-model="authStore.data.username"
           class="h-10 w-full rounded-md border border-[#292D36]
-                 bg-[#101216] px-4 text-sm text-white
-                 placeholder-[#4B5563] outline-none
-                 transition focus:border-[#8B5CF6]"
+                  bg-[#101216] px-4 text-sm text-white
+                  placeholder-[#4B5563] outline-none
+                  transition focus:border-[#8B5CF6]"
         />
       </div>
 
@@ -30,16 +30,16 @@
         >
             Пароль
         </label>
- 
+        
         <input
           id="confirmPassword"
           type="password"
           placeholder="••••••••"
-          v-model="data.password"
+          v-model="authStore.data.password"
           class="h-10 w-full rounded-md border border-[#292D36]
-                 bg-[#101216] px-4 text-sm text-white
-                 placeholder-[#4B5563] outline-none
-                 transition focus:border-[#8B5CF6]"
+                  bg-[#101216] px-4 text-sm text-white
+                  placeholder-[#4B5563] outline-none
+                  transition focus:border-[#8B5CF6]"
         />
       </div>
 
@@ -47,9 +47,9 @@
       <button
         type="submit"
         class="h-10 w-full rounded-md
-               bg-[#8B5CF6] text-sm font-semibold text-white
-               shadow-[0_4px_14px_rgba(139,92,246,0.25)]
-               transition hover:bg-[#7C3AED] cursor-pointer"
+                bg-[#8B5CF6] text-sm font-semibold text-white
+                shadow-[0_4px_14px_rgba(139,92,246,0.25)]
+                transition hover:bg-[#7C3AED] cursor-pointer"
       >
         Continue to Aura
       </button>
@@ -59,15 +59,16 @@
 </template>
 
 <script setup lang="ts">
+import { UserAuth } from '../../services/Auth'
+import { useAuthStore } from '../../stores/Auth'
 
-import { reactive, watch } from 'vue';
+const authStore = useAuthStore()
 
+async function submitAuth() {
+  const result = await UserAuth(authStore.data)
 
-const data = reactive ({
-  username: '',
-  password: ''
-})
-
+  console.log(result)
+}
 
 </script>
 
