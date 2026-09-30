@@ -12,9 +12,9 @@
         </label>
 
         <input
-          id="password"
-          type="password"
+          id="username"
           placeholder="Логин"
+          v-model="data.username"
           class="h-10 w-full rounded-md border border-[#292D36]
                  bg-[#101216] px-4 text-sm text-white
                  placeholder-[#4B5563] outline-none
@@ -35,6 +35,7 @@
           id="confirmPassword"
           type="password"
           placeholder="••••••••"
+          v-model="data.password"
           class="h-10 w-full rounded-md border border-[#292D36]
                  bg-[#101216] px-4 text-sm text-white
                  placeholder-[#4B5563] outline-none
@@ -57,10 +58,17 @@
     
 </template>
 
-<script>
-export default {
+<script setup lang="ts">
 
-}
+import { reactive, watch } from 'vue';
+
+
+const data = reactive ({
+  username: '',
+  password: ''
+})
+
+
 </script>
 
 <style>
