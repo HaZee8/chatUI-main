@@ -62,12 +62,20 @@
 import { UserAuth } from '../../services/Auth'
 import { useAuthStore } from '../../stores/Auth'
 
+
 const authStore = useAuthStore()
 
 async function submitAuth() {
-  const result = await UserAuth(authStore.data)
+  try {
+    const result = await UserAuth(authStore.data)
+    localStorage.setItem('auth', (authStore.data.username))
+    localStorage.setItem('token', (result.token))
+    console.log(result)
 
-  console.log(result)
+    await navigateTo('/')
+  } catch (error) {
+    console.error('Ошибка авторизации:', error)
+  }
 }
 
 </script>
