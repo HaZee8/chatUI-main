@@ -1,6 +1,8 @@
 <template>
     <!-- Conversation -->
         <div
+            v-for="chat in chatsdata"
+            :key="chat.id"
             class="
             h-[54px]
             px-3
@@ -36,13 +38,14 @@
             "
             >
             <p class="text-[12px] text-[#8e949e] truncate">
-                UI components hierarchy draft
+                {{ chat.title }}
             </p>
 
             <p class="text-[10px] text-[#555c67] mt-1">
                 1 week ago
             </p>
             </div>
+            
 
         </div>
 </template>
@@ -50,13 +53,23 @@
 <script setup lang="ts">
 
 import { onMounted } from 'vue'
+import {GetActiveChats} from '../../../services/ActiveChats'
+import type {ActiveChat} from '../../../models/ActiveChats'
+
+const chatsdata = ref<ActiveChat[]>([])
 
 onMounted(async () => {
-  await getChats()
+    await getChats()
 })
 
 async function getChats() {
-    
+    try{
+        chatsdata.value = await GetActiveChats()
+        console.log(chatsdata)
+    }
+    catch(error){
+
+    }
 }
 
 

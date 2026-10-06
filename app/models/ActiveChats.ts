@@ -1,5 +1,5 @@
-export interface ActiveChats {
+export interface ActiveChat {
     id: number
     title: string,
-    text: string
+    createdAt: string
 }
