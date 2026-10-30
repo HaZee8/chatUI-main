@@ -5,7 +5,7 @@ export async function UserAuth(data: UserAuthData) {
     const userdata = await $fetch<{
         token: string
     }>
-    ('https://fc177929714abc7a.mokky.dev/auth', {
+    ('http://localhost:8001/auth/login', {
         method: 'POST',
         body: data
 

@@ -70,7 +70,7 @@ async function submitAuth() {
   try {
     const result = await UserAuth(authStore.data)
     localStorage.setItem('auth', (authStore.data.username))
-    localStorage.setItem('token', (result.token))
+    localStorage.setItem('token', (result.access_token))
     console.log(result)
 
     await navigateTo('/')
