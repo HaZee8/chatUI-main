@@ -1,5 +1,5 @@
 export interface ActiveChat {
-    id: number
+    id: number,
     title: string,
     createdAt: string
 }

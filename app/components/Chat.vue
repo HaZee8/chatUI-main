@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-[#08090b] text-white flex overflow-hidden">
+    <div class="h-dvh w-full bg-[#08090b] text-white flex overflow-hidden">
     
         <!-- Toggle sidebar -->
         <input
