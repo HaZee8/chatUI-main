@@ -65,6 +65,7 @@
                 text-[#d7dae0]
                 placeholder:text-[#5f6671]
             "
+            v-model="MessageOfUserInput"
             />
 
 
@@ -101,6 +102,7 @@
 
             <!-- Send -->
             <button
+            @click="SendChatMessageById"
             class="
                 w-[31px]
                 h-[31px]
@@ -127,6 +129,7 @@
                 d="M5 12h14M13 6l6 6-6 6"
                 />
             </svg>
+            
             </button>
 
         </div>
@@ -136,9 +139,57 @@
     </footer>
 </template>
 
-<script>
-export default {
+<script setup lang="">
+import { ref } from 'vue'
 
+import {SendMessageResponseAndGetMessageRequestService} from '../../../services/SendMessageResponseAndGetMessageRequestService'
+
+const TEST_USER_ID = '1'
+const TEST_CHAT_ID = '101'
+
+const MessageOfUserInput = ref('')
+
+async function SendChatMessageById() {
+  const text = MessageOfUserInput.value.trim()
+
+  if (!text) return
+
+  try {
+    const messages = JSON.parse(
+      localStorage.getItem('messages') || '[]'
+    )
+
+    // Добавляем сообщение пользователя
+    messages.push({
+      role: 'user',
+      content: text,
+      createdAt: new Date().toISOString()
+    })
+
+    localStorage.setItem('messages', JSON.stringify(messages))
+    window.dispatchEvent(new Event('new-message'))
+
+    const result = await SendMessageResponseAndGetMessageRequestService({
+      userid: TEST_USER_ID,
+      chatid: TEST_CHAT_ID,
+      text
+    })
+
+    // Добавляем ответ AI
+    messages.push({
+      role: 'assistant',
+      content: result.textAi,
+      createdAt: result.createdAt
+    })
+
+    localStorage.setItem('messages', JSON.stringify(messages))
+    window.dispatchEvent(new Event('new-message'))
+
+    MessageOfUserInput.value = ''
+
+  } catch (error) {
+    console.error('Ошибка:', error)
+  }
 }
 </script>
 

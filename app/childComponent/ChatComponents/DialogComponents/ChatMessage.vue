@@ -48,24 +48,43 @@
 </template>
 
 <script setup lang="ts">
-import { GetChatMessageById } from '../../../services/GetChatMessageById';
-import { onMounted, ref } from 'vue'
+// import { GetChatMessageById } from '../../../services/GetChatMessageById';
+// import { onMounted, ref } from 'vue'
 
-onMounted(async () => {
-    await GetChatMessages()
-})
+// onMounted(async () => {
+//     await GetChatMessages()
+// })
+
+// const messages = ref<any[]>([])
+
+// async function GetChatMessages() {
+//   try {
+//     const result = await GetChatMessageById()
+//     messages.value = result[0]?.ListMessage ?? []
+//     console.log(result[0].ListMessage)
+
+//   } catch (error) {
+//     console.error('Ошибка запроса чата', error)
+//   }
+// }
+
+
+import { ref, onMounted } from 'vue'
 
 const messages = ref<any[]>([])
 
-async function GetChatMessages() {
-  try {
-    const result = await GetChatMessageById()
-    messages.value = result[0]?.ListMessage ?? []
-    console.log(result[0].ListMessage)
+onMounted(() => {
+  messages.value = JSON.parse(
+    localStorage.getItem('messages') || '[]'
+  )
 
-  } catch (error) {
-    console.error('Ошибка запроса чата', error)
-  }
+  window.addEventListener('new-message', updateMessages)
+})
+
+function updateMessages() {
+  messages.value = JSON.parse(
+    localStorage.getItem('messages') || '[]'
+  )
 }
 
 </script>
