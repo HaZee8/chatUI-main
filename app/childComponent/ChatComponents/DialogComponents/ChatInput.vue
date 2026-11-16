@@ -102,7 +102,7 @@
 
             <!-- Send -->
             <button
-            @click="SendChatMessageById"
+            @click="SendChatMessageByIdTest"
             class="
                 w-[31px]
                 h-[31px]
@@ -139,56 +139,137 @@
     </footer>
 </template>
 
-<script setup lang="">
+<script setup lang="ts">
+// import { ref } from 'vue'
+
+// import {SendMessageResponseAndGetMessageRequestService} from '../../../services/SendMessageResponseAndGetMessageRequestService'
+
+// const TEST_USER_ID = '1'
+// const TEST_CHAT_ID = '101'
+
+// const MessageOfUserInput = ref('')
+
+// async function SendChatMessageById() {
+//   const text = MessageOfUserInput.value.trim()
+
+//   if (!text) return
+
+//   try {
+//     const messages = JSON.parse(
+//       localStorage.getItem('messages') || '[]'
+//     )
+
+//     // Добавляем сообщение пользователя
+//     messages.push({
+//       role: 'user',
+//       content: text,
+//       createdAt: new Date().toISOString()
+//     })
+
+//     localStorage.setItem('messages', JSON.stringify(messages))
+//     window.dispatchEvent(new Event('new-message'))
+
+//     const result = await SendMessageResponseAndGetMessageRequestService({
+//       userid: TEST_USER_ID,
+//       chatid: TEST_CHAT_ID,
+//       text
+//     })
+
+//     // Добавляем ответ AI
+//     messages.push({
+//       role: 'assistant',
+//       content: result.textAi,
+//       createdAt: result.createdAt
+//     })
+
+//     localStorage.setItem('messages', JSON.stringify(messages))
+//     window.dispatchEvent(new Event('new-message'))
+
+//     MessageOfUserInput.value = ''
+
+//   } catch (error) {
+//     console.error('Ошибка:', error)
+//   }
+// }
+
+
 import { ref } from 'vue'
 
-import {SendMessageResponseAndGetMessageRequestService} from '../../../services/SendMessageResponseAndGetMessageRequestService'
-
-const TEST_USER_ID = '1'
-const TEST_CHAT_ID = '101'
+import type { ChatMessage } from '~/models/depseekApi/SendMessage'
+import { SendChatMessageById } from '~/services/depseekApiService/SendMessageService'
 
 const MessageOfUserInput = ref('')
+const isLoading = ref(false)
 
-async function SendChatMessageById() {
+function getChatId(): string {
+  let chatId = localStorage.getItem('currentChatId')
+
+  if (!chatId) {
+    chatId = crypto.randomUUID()
+    localStorage.setItem('currentChatId', chatId)
+  }
+
+  return chatId
+}
+
+function getMessages(chatId: string): ChatMessage[] {
+  return JSON.parse(
+    localStorage.getItem(`messages_${chatId}`) || '[]'
+  )
+}
+
+function saveMessages(chatId: string, messages: ChatMessage[]) {
+  localStorage.setItem(
+    `messages_${chatId}`,
+    JSON.stringify(messages)
+  )
+
+  window.dispatchEvent(new Event('new-message'))
+}
+
+async function SendChatMessageByIdTest() {
   const text = MessageOfUserInput.value.trim()
 
-  if (!text) return
+  if (!text || isLoading.value) return
+
+  const chatId = getChatId()
+  const messages = getMessages(chatId)
+
+  // Сохраняем сообщение пользователя
+  messages.push({
+    role: 'user',
+    content: text,
+    createdAt: new Date().toISOString()
+  })
+
+  saveMessages(chatId, messages)
+
+  MessageOfUserInput.value = ''
+  isLoading.value = true
 
   try {
-    const messages = JSON.parse(
-      localStorage.getItem('messages') || '[]'
-    )
+    // Передаём DeepSeek всю историю переписки
+    const resultDeps = await SendChatMessageById({
+      model: 'deepseek-v4.1-flash:free',
+      messages: messages.map(message => ({
+        role: message.role,
+        content: message.content
+      }))
+    })
 
-    // Добавляем сообщение пользователя
+    // Сохраняем ответ AI
     messages.push({
-      role: 'user',
-      content: text,
+      role: 'assistant',
+      content: resultDeps.content,
       createdAt: new Date().toISOString()
     })
 
-    localStorage.setItem('messages', JSON.stringify(messages))
-    window.dispatchEvent(new Event('new-message'))
-
-    const result = await SendMessageResponseAndGetMessageRequestService({
-      userid: TEST_USER_ID,
-      chatid: TEST_CHAT_ID,
-      text
-    })
-
-    // Добавляем ответ AI
-    messages.push({
-      role: 'assistant',
-      content: result.textAi,
-      createdAt: result.createdAt
-    })
-
-    localStorage.setItem('messages', JSON.stringify(messages))
-    window.dispatchEvent(new Event('new-message'))
-
-    MessageOfUserInput.value = ''
+    saveMessages(chatId, messages)
 
   } catch (error) {
-    console.error('Ошибка:', error)
+    console.error('Ошибка отправки сообщения:', error)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
