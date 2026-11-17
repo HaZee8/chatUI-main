@@ -1,39 +1,73 @@
 
 <template>
-  <section
-    class="flex-1 overflow-y-auto px-7 py-6"
-  >
-    <div class="max-w-[930px] mx-auto space-y-5">
+  <section class="min-h-0 min-w-0 overflow-y-auto overflow-x-hidden chat-messages-container">
+    <div class="max-w-[900px] mx-auto px-8 py-7">
 
       <div
-        v-for="(message, index) in messages"
+        v-for="(msg, index) in messages"
         :key="index"
-        class="flex"
-        :class="message.role === 'user'
-          ? 'justify-end'
-          : 'justify-start'"
+        class="mb-7"
+        :class="msg.role === 'user' ? 'flex justify-end' : 'flex items-start'"
       >
         <div
-          class="max-w-[75%] rounded-xl px-4 py-3"
-          :class="message.role === 'user'
-            ? 'bg-[#8b5cf6] text-white'
-            : 'bg-[#171a21] text-[#d7dae0]'"
+          class="flex items-start gap-3"
+          :class="msg.role === 'user' ? 'max-w-[580px]' : ''"
         >
-          <p class="text-sm whitespace-pre-wrap break-words">
-            {{ message.content }}
-          </p>
 
-          <p class="text-[10px] opacity-50 mt-2">
-            {{ formatDate(message.createdAt) }}
-          </p>
+          <!-- Аватар -->
+          <div
+            class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center"
+            :class="[
+              msg.role === 'user'
+                ? 'order-2 bg-gradient-to-br from-[#d6b98c] to-[#6b5540]'
+                : 'bg-gradient-to-br from-[#8b5cf6] to-[#06b6d4]'
+            ]"
+          >
+            <span class="text-[10px] font-semibold">A</span>
+          </div>
+
+          <!-- Сообщение -->
+          <div
+            class="px-4 py-4 border"
+            :class="[
+              msg.role === 'user'
+                ? 'order-1 bg-[#181b21] border-[#20242c] rounded-[15px] rounded-tr-[5px]'
+                : 'max-w-[600px] bg-[#111317] border-[#171a20] rounded-[14px] rounded-tl-[5px]'
+            ]"
+          >
+
+            <!-- Текст -->
+            <p
+              v-if="msg.content"
+              class="text-[12px] leading-[1.6] text-[#d7dae0] whitespace-pre-wrap break-words"
+            >
+              {{ msg.content }}
+            </p>
+
+            <!-- Изображения -->
+            <div
+              v-if="msg.images?.length"
+              class="flex flex-wrap gap-2"
+              :class="msg.content ? 'mt-3' : ''"
+            >
+              <img
+                v-for="(image, imageIndex) in msg.images"
+                :key="imageIndex"
+                :src="image"
+                alt="Прикреплённое изображение"
+                class="max-w-full max-h-[280px] object-contain rounded-lg border border-[#343b48]"
+              />
+            </div>
+
+            <!-- Время -->
+            <div class="text-right mt-3">
+              <span class="text-[9px] text-[#626a76]">
+                {{ formatDate(msg.createdAt) }}
+              </span>
+            </div>
+
+          </div>
         </div>
-      </div>
-
-      <div
-        v-if="isLoading"
-        class="text-sm text-[#727a86]"
-      >
-        Aura печатает...
       </div>
 
     </div>
@@ -45,7 +79,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import type { ChatMessage } from '~/models/depseekApi/SendMessage'
 
 const messages = ref<ChatMessage[]>([])
-const isLoading = ref(false)
 
 function updateMessages() {
   const chatId = localStorage.getItem('currentChatId')
@@ -71,7 +104,6 @@ function formatDate(date?: string) {
 
 onMounted(() => {
   updateMessages()
-
   window.addEventListener('new-message', updateMessages)
 })
 
@@ -80,9 +112,7 @@ onUnmounted(() => {
 })
 </script>
 
-
 <style scoped>
-
 .chat-messages-container::-webkit-scrollbar {
   width: 8px;
 }
@@ -101,10 +131,8 @@ onUnmounted(() => {
   background: #8b5cf6;
 }
 
-/* Firefox */
 .chat-messages-container {
   scrollbar-width: thin;
   scrollbar-color: #2a2d35 #08090b;
 }
-
 </style>
